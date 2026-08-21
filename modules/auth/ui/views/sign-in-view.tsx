@@ -2,10 +2,10 @@
 
 import { z } from 'zod'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { OctagonAlertIcon } from 'lucide-react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { FaGoogle, FaGithub } from 'react-icons/fa'
 
 import { authClient } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
@@ -26,7 +26,6 @@ const signInSchema = z.object({
 })
 
 export function SignInView() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -43,13 +42,27 @@ export function SignInView() {
   const onSubmit = ({ email, password }: z.infer<typeof signInSchema>) => {
     setError(null)
     setLoading(true)
-    authClient.signIn.email(
-      { email, password },
-      {
-        onSuccess: () => router.push('/'),
-        onError: ({error}) => setError(error.message),
-      },
-    ).finally(() => setLoading(false))
+    authClient.signIn
+      .email(
+        { email, password, callbackURL: '/' },
+        {
+          onError: ({ error }) => setError(error.message),
+        },
+      )
+      .finally(() => setLoading(false))
+  }
+
+  const onLoginWithProvider = (provider: 'google' | 'github') => {
+    setError(null)
+    setLoading(true)
+    authClient.signIn
+      .social(
+        { provider },
+        {
+          onError: ({ error }) => setError(error.message),
+        },
+      )
+      .finally(() => setLoading(false))
   }
 
   if (session) {
@@ -137,10 +150,24 @@ export function SignInView() {
               </span>
             </div>
             <div className='grid grid-cols-2 gap-4'>
-              <Button variant='outline' type='button' className='w-full' disabled={loading}>
+              <Button
+                variant='outline'
+                type='button'
+                className='w-full'
+                disabled={loading}
+                onClick={() => onLoginWithProvider('google')}
+              >
+                <FaGoogle />
                 Google
               </Button>
-              <Button variant='outline' type='button' className='w-full' disabled={loading}>
+              <Button
+                variant='outline'
+                type='button'
+                className='w-full'
+                disabled={loading}
+                onClick={() => onLoginWithProvider('github')}
+              >
+                <FaGithub />
                 GitHub
               </Button>
             </div>
