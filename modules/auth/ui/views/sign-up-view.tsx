@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { OctagonAlertIcon } from 'lucide-react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { FaGoogle, FaGithub } from 'react-icons/fa'
 
 import { authClient } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
@@ -20,22 +21,24 @@ import {
 } from '@/components/ui/field'
 import Link from 'next/link'
 
-const signUpSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters long'),
-  email: z.email(),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
-  confirmPassword: z.string().min(8, 'Confirm Password must be at least 8 characters long'),
-}).refine(({ password, confirmPassword }) => password === confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-})
+const signUpSchema = z
+  .object({
+    name: z.string().min(2, 'Name must be at least 2 characters long'),
+    email: z.email(),
+    password: z.string().min(8, 'Password must be at least 8 characters long'),
+    confirmPassword: z
+      .string()
+      .min(8, 'Confirm Password must be at least 8 characters long'),
+  })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 
 export function SignUpView() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-
-  const { data: session } = authClient.useSession()
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -47,27 +50,35 @@ export function SignUpView() {
     },
   })
 
-  const onSubmit = ({ name, email, password }: z.infer<typeof signUpSchema>) => {
+  const onSubmit = ({
+    name,
+    email,
+    password,
+  }: z.infer<typeof signUpSchema>) => {
     setError(null)
     setLoading(true)
-    authClient.signUp.email(
-      { name, email, password },
-      {
-        onSuccess: () => router.push('/'),
-        onError: ({error}) => setError(error.message),
-      },
-    ).finally(() => setLoading(false))
+    authClient.signUp
+      .email(
+        { name, email, password, callbackURL: '/' },
+        {
+          onSuccess: () => router.push('/'),
+          onError: ({ error }) => setError(error.message),
+        },
+      )
+      .finally(() => setLoading(false))
   }
 
-  if (session) {
-    return (
-      <Card className='p-4'>
-        <div>
-          Logged in as {session.user.name} ({session.user.email})
-        </div>
-        <Button onClick={() => authClient.signOut()}>Sign out</Button>
-      </Card>
-    )
+  const onLoginWithProvider = (provider: 'google' | 'github') => {
+    setError(null)
+    setLoading(true)
+    authClient.signIn
+      .social(
+        { provider },
+        {
+          onError: ({ error }) => setError(error.message),
+        },
+      )
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -79,7 +90,9 @@ export function SignUpView() {
             id='form-sign-up'
             onSubmit={form.handleSubmit(onSubmit)}
           >
-            <h1 className='text-2xl font-semibold text-center'>Welcome to Meet.AI</h1>
+            <h1 className='text-2xl font-semibold text-center'>
+              Welcome to Meet.AI
+            </h1>
             <p className='text-sm text-muted-foreground mb-4 text-center'>
               Create an account to get started
             </p>
@@ -149,7 +162,9 @@ export function SignUpView() {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor='form-confirm-password'>Confirm Password:</FieldLabel>
+                    <FieldLabel htmlFor='form-confirm-password'>
+                      Confirm Password:
+                    </FieldLabel>
                     <Input
                       {...field}
                       id='form-confirm-password'
@@ -184,10 +199,24 @@ export function SignUpView() {
               </span>
             </div>
             <div className='grid grid-cols-2 gap-4'>
-              <Button variant='outline' type='button' className='w-full' disabled={loading}>
+              <Button
+                variant='outline'
+                type='button'
+                className='w-full'
+                disabled={loading}
+                onClick={() => onLoginWithProvider('google')}
+              >
+                <FaGoogle />
                 Google
               </Button>
-              <Button variant='outline' type='button' className='w-full' disabled={loading}>
+              <Button
+                variant='outline'
+                type='button'
+                className='w-full'
+                disabled={loading}
+                onClick={() => onLoginWithProvider('github')}
+              >
+                <FaGithub />
                 GitHub
               </Button>
             </div>
