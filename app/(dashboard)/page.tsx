@@ -13,6 +13,6 @@ export default async function Home() {
   if (!session) {
     redirect('/sign-in')
   }
-    
+  
   return <HomeView />
 }
