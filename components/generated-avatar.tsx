@@ -1,5 +1,6 @@
-import { Avatar as DiceBearAvatar } from '@dicebear/core'
-import { botttsNeutral, initials } from '@dicebear/collection'
+import { Avatar as DiceBearAvatar, Style } from '@dicebear/core'
+import botttsNeutral from '@dicebear/styles/bottts-neutral.json'
+import initials from '@dicebear/styles/initials.json'
 
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -15,15 +16,13 @@ export function GeneratedAvatar({
   variant,
   className,
 }: GeneratedAvatarProps) {
-  // let avatar = new DiceBearAvatar(
-  //   variant === 'botttsNeutral' ? botttsNeutral : initials,
-  //   {
-  //     seed,
-  //   },
-  // )
+  const style = new Style(variant === 'botttsNeutral' ? botttsNeutral : initials)
+  const avatar = new DiceBearAvatar(style, {
+    seed,
+  })
   return (
     <Avatar className={cn(className)}>
-      {/* <AvatarImage src={avatar.toDataUri()} alt='Avatar' /> */}
+      <AvatarImage src={avatar.toDataUri()} alt='Avatar' />
       <AvatarFallback>{seed.charAt(0).toUpperCase()}</AvatarFallback>
     </Avatar>
   )
