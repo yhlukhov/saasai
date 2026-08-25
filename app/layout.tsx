@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { TRPCReactProvider } from '@/trpc/client'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
@@ -14,12 +15,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html
-      lang='en'
-      className={`${inter.className} h-full antialiased`}
-    >
+    <html lang='en' className={`${inter.className} h-full antialiased`}>
       <body>
-        <TooltipProvider>{children}</TooltipProvider>
+        <TRPCReactProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   )
