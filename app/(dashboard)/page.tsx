@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { HomeView } from '@/modules/home/ui/views/home-view'
 
-export default async function Home() {
+export default async function HomePage() {
   const session = await auth.api.getSession({
     headers: await headers()
   })
