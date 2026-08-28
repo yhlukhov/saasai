@@ -8,6 +8,10 @@ export function AgentsView() {
     const trpc = useTRPC()
     const { data } = useSuspenseQuery(trpc.agents.getMany.queryOptions())
 
+    const onOpenCh = (open: boolean) => {
+        
+    }
+
     return (
         <div>
             {JSON.stringify(data, null, 2)}
