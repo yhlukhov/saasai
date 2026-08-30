@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { TRPCReactProvider } from '@/trpc/client'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from '@/components/ui/toast'
 import './globals.css'
 
 const inter = Inter({
@@ -18,7 +19,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang='en' className={`${inter.className} h-full antialiased`}>
       <body>
         <TRPCReactProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <Toaster />
+            {children}
+          </TooltipProvider>
         </TRPCReactProvider>
       </body>
     </html>
