@@ -18,7 +18,7 @@ export function AgentsView() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [filters, setFilters] = useAgentsFilters()
   const {
-    data: { items, total, totalPages },
+    data: { items, totalPages },
   } = useSuspenseQuery(trpc.agents.getMany.queryOptions({...filters}))
 
   return (
