@@ -1,9 +1,10 @@
 'use client'
 
 import { useTable, type ColumnDef, type RowData } from '@tanstack/react-table'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 
 import { features, type DataTableFeatures } from './data-table-features'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[]

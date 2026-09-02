@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import {NuqsAdapter} from 'nuqs/adapters/next/app'
 import { TRPCReactProvider } from '@/trpc/client'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/toast'
@@ -18,12 +19,14 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang='en' className={`${inter.className} h-full antialiased`}>
       <body>
-        <TRPCReactProvider>
-          <TooltipProvider>
-            <Toaster />
-            {children}
-          </TooltipProvider>
-        </TRPCReactProvider>
+        <NuqsAdapter>
+          <TRPCReactProvider>
+            <TooltipProvider>
+              <Toaster />
+              {children}
+            </TooltipProvider>
+          </TRPCReactProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )
