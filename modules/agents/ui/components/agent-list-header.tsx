@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PlusIcon, XCircleIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NewAgentDialog } from './new-agent-dialog'

@@ -29,7 +29,7 @@ export default async function AgentsPage({searchParams}:Props) {
   }
 
   const queryClient = getQueryClient()
-  void queryClient.query(trpc.agents.getMany.queryOptions({...filters})).catch(() => {})
+  void queryClient.query(trpc.agents.getMany.queryOptions({...filters}))
 
   return (
     <>

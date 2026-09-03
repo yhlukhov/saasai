@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { Controller, useForm } from 'react-hook-form'
-import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { agentsInsertSchema } from '../../schemas'
 import { useTRPC } from '@/trpc/client'
@@ -16,7 +15,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
-import { OctagonAlertIcon } from 'lucide-react'
 import { GeneratedAvatar } from '@/components/generated-avatar'
 
 interface AgentFormProps {
@@ -31,7 +29,6 @@ export function AgentForm({
   initialValues,
 }: AgentFormProps) {
   const trpc = useTRPC()
-  const router = useRouter()
   const queryClient = useQueryClient()
 
   const createAgent = useMutation(
