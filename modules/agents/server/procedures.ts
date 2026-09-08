@@ -24,31 +24,29 @@ export const agentsRouter = createTRPCRouter({
           ...getColumns(agents),
         })
         .from(agents)
-        .where(and(
-          eq(agents.id, input.id),
-          eq(agents.userId, ctx.auth.user.id)
-        ))
-      if(!existingAgent) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' } )
+        .where(
+          and(eq(agents.id, input.id), eq(agents.userId, ctx.auth.user.id)),
+        )
+      if (!existingAgent) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' })
       }
       return existingAgent
     }),
 
   getMany: protectedProcedure
     .input(
-      z
-        .object({
-          page: z.number().min(1).default(DEFAULT_PAGE),
-          pageSize: z
-            .number()
-            .min(MIN_PAGE_SIZE)
-            .max(MAX_PAGE_SIZE)
-            .default(DEFAULT_PAGE_SIZE),
-          search: z.string().nullish(),
-        })
+      z.object({
+        page: z.number().min(1).default(DEFAULT_PAGE),
+        pageSize: z
+          .number()
+          .min(MIN_PAGE_SIZE)
+          .max(MAX_PAGE_SIZE)
+          .default(DEFAULT_PAGE_SIZE),
+        search: z.string().nullish(),
+      }),
     )
     .query(async ({ ctx, input }) => {
-      const {page, pageSize, search} = input
+      const { page, pageSize, search } = input
       const data = await db
         .select({
           //! Change to actual count:
@@ -80,7 +78,7 @@ export const agentsRouter = createTRPCRouter({
 
       const totalPages = Math.ceil(total[0].count / pageSize)
 
-      return { items:data, total: total[0].count, totalPages }
+      return { items: data, total: total[0].count, totalPages }
     }),
 
   create: protectedProcedure
@@ -105,13 +103,10 @@ export const agentsRouter = createTRPCRouter({
       const [updatedAgent] = await db
         .update(agents)
         .set({ name, instructions })
-        .where(and(
-          eq(agents.id, id),
-          eq(agents.userId, ctx.auth.user.id)
-        ))
+        .where(and(eq(agents.id, id), eq(agents.userId, ctx.auth.user.id)))
         .returning()
-      if(!updatedAgent) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' } )
+      if (!updatedAgent) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' })
       }
       return updatedAgent
     }),
@@ -121,13 +116,12 @@ export const agentsRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const [removedAgent] = await db
         .delete(agents)
-        .where(and(
-          eq(agents.id, input.id),
-          eq(agents.userId, ctx.auth.user.id)
-        ))
+        .where(
+          and(eq(agents.id, input.id), eq(agents.userId, ctx.auth.user.id)),
+        )
         .returning()
-      if(!removedAgent) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' } )
+      if (!removedAgent) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Agent not found' })
       }
-    })
+    }),
 })

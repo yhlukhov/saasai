@@ -1,6 +1,21 @@
 import { nanoid } from 'nanoid'
 import { defineRelations } from 'drizzle-orm'
-import { pgTable, text, timestamp, boolean, index } from 'drizzle-orm/pg-core'
+import {
+  pgTable,
+  pgEnum,
+  timestamp,
+  boolean,
+  index,
+  text,
+} from 'drizzle-orm/pg-core'
+
+export const meetingStatus = pgEnum('meeting_status', [
+  'upcoming',
+  'active',
+  'completed',
+  'processing',
+  'cancelled',
+])
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -87,16 +102,41 @@ export const agents = pgTable('agents', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+export const meetings = pgTable('meetings', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  name: text('name').notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  agentId: text('agent_id')
+    .notNull()
+    .references(() => agents.id, { onDelete: 'cascade' }),
+  status: meetingStatus('status').notNull().default('upcoming'),
+  startedAt: timestamp('started_at'),
+  endedAt: timestamp('ended_at'),
+  transcriptUrl: text('transcript_url'),
+  recordingUrl: text('recording_url'),
+  summary: text('summary'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 export const schemaRelations = defineRelations(
   {
     user,
     session,
     account,
+    agents,
+    meetings,
   },
   (r) => ({
     user: {
       sessions: r.many.session(),
       accounts: r.many.account(),
+      agents: r.many.agents(),
+      meetings: r.many.meetings(),
     },
     session: {
       user: r.one.user({
@@ -108,6 +148,23 @@ export const schemaRelations = defineRelations(
       user: r.one.user({
         from: r.account.userId,
         to: r.user.id,
+      }),
+    },
+    agents: {
+      user: r.one.user({
+        from: r.agents.userId,
+        to: r.user.id,
+      }),
+      meetings: r.many.meetings(),
+    },
+    meetings: {
+      user: r.one.user({
+        from: r.meetings.userId,
+        to: r.user.id,
+      }),
+      agent: r.one.agents({
+        from: r.meetings.agentId,
+        to: r.agents.id,
       }),
     },
   }),

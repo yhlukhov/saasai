@@ -11,6 +11,8 @@ import { DataTable } from '../components/data-table'
 import { DataPagination } from '../components/data-pagination'
 import { NewAgentDialog } from '../components/new-agent-dialog'
 import { useAgentsFilters } from '../../hooks/use-agents-filters'
+import { LoadingState } from '@/components/loading-state'
+import { ErrorState } from '@/components/error-state'
 import { EmptyState } from '@/components/empty-state'
 import { Button } from '@/components/ui/button'
 
@@ -46,4 +48,20 @@ export function AgentsView() {
       )}
     </div>
   )
+}
+
+export const AgentsViewLoading = () => {
+  return (
+    <LoadingState
+      title='Loading agents'
+      description='This may take few seconds'
+    />
+  )
+}
+
+export const AgentsViewError = () => {
+  return <ErrorState
+    title='Error loading agents'
+    description='Something went wrong'
+  />
 }
