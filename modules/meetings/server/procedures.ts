@@ -11,6 +11,7 @@ import {
   MAX_PAGE_SIZE,
   DEFAULT_PAGE_SIZE,
 } from '@/constants'
+import { meetingsInsertSchema, meetingsUpdateSchema } from '../schemas'
 
 export const meetingsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -59,7 +60,7 @@ export const meetingsRouter = createTRPCRouter({
         .limit(pageSize)
         .offset((page - 1) * pageSize)
 
-        const [total] = await db
+      const [total] = await db
         .select({
           count: count(),
         })
@@ -71,12 +72,42 @@ export const meetingsRouter = createTRPCRouter({
           ),
         )
 
-        const totalPages = Math.ceil(total.count / pageSize)
+      const totalPages = Math.ceil(total.count / pageSize)
 
-        return {
-          items: data,
-          total: total.count,
-          totalPages,
-        }
+      return {
+        items: data,
+        total: total.count,
+        totalPages,
+      }
+    }),
+
+  create: protectedProcedure
+    .input(meetingsInsertSchema)
+    .mutation(async ({ ctx, input }) => {
+      const [createdMeeting] = await db
+        .insert(meetings)
+        .values({
+          ...input,
+          userId: ctx.auth.user.id,
+        })
+        .returning()
+
+      // TODO: Create stream call, upseart stream users
+      return createdMeeting
+    }),
+
+  update: protectedProcedure
+    .input(meetingsUpdateSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id, agentId, name } = input
+      const [updatedMeeting] = await db
+        .update(meetings)
+        .set({ name, agentId })
+        .where(and(eq(meetings.id, id), eq(meetings.userId, ctx.auth.user.id)))
+        .returning()
+      if (!updatedMeeting) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Meeting not found' })
+      }
+      return updatedMeeting
     }),
 })
