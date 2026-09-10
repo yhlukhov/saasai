@@ -16,7 +16,7 @@ export function MeetingsView() {
 
   return (
     <div className='flex flex-col items-center justify-center gap-4'>
-      {JSON.stringify(data.items)}
+      {JSON.stringify(data.items, null, 2)}
     </div>
   )
 }
