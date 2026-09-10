@@ -3,12 +3,12 @@
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { type DataTableFeatures } from './data-table-features'
-import { type AgentGetOne } from '../../types'
+import { type AgentGetMany } from '../../types'
 import { GeneratedAvatar } from '@/components/generated-avatar'
 import { CornerDownRightIcon, VideoIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
-const columnHelper = createColumnHelper<DataTableFeatures, AgentGetOne>()
+const columnHelper = createColumnHelper<DataTableFeatures, AgentGetMany[number]>()
 
 export const columns = columnHelper.columns([
   columnHelper.accessor('name', {
