@@ -27,7 +27,7 @@ export function DataTable<TData extends RowData>({
   }
 
   return (
-    <div className='overflow-hidden rounded-lg border bg-background'>
+    <div className='w-full overflow-hidden rounded-lg border bg-background'>
       <Table>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
