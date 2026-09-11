@@ -5,13 +5,15 @@ import { PlusIcon, XCircleIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NewAgentDialog } from './new-agent-dialog'
 import { useAgentsFilters } from '../../hooks/use-agents-filters'
-import { AgentsSearchFilter } from './agents-search-filter'
+import { SearchFilter } from '@/components/search-filter'
 import { DEFAULT_PAGE } from '@/constants'
+import { SearchFilterOption } from '@/types'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 export function AgentsListHeader() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [filters, setFilters] = useAgentsFilters()
-  const isAnyFilterModified = !!filters.search
+  const isFilterModified = !!filters.search
   const handleClearFilters = () => {
     setFilters({ search: '', page: DEFAULT_PAGE })
   }
@@ -27,15 +29,23 @@ export function AgentsListHeader() {
             New Agent
           </Button>
         </div>
-        <div className='flex items-center gap-x-2 p-1'>
-          <AgentsSearchFilter />
-          {isAnyFilterModified && (
-            <Button variant='outline' size='sm' className='text-muted-foreground' onClick={handleClearFilters}>
-              <XCircleIcon />
-              Clear
-            </Button>
-          )}
-        </div>
+        <ScrollArea>
+          <div className='flex items-center gap-x-2 p-1'>
+            <SearchFilter option={SearchFilterOption.Agents} />
+            {isFilterModified && (
+              <Button
+                variant='outline'
+                size='sm'
+                className='text-muted-foreground'
+                onClick={handleClearFilters}
+              >
+                <XCircleIcon />
+                Clear
+              </Button>
+            )}
+          </div>
+          <ScrollBar orientation='horizontal' />
+        </ScrollArea>
       </div>
     </>
   )

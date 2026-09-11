@@ -2,10 +2,19 @@ import { SearchIcon } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
 
-import { useAgentsFilters } from '../../hooks/use-agents-filters'
+import { SearchFilterOption } from '@/types'
+import { useAgentsFilters } from '@/modules/agents/hooks/use-agents-filters'
+import { useMeetingsFilters } from '@/modules/meetings/hooks/use-meetings-filters'
 
-export function AgentsSearchFilter() {
-  const [filters, setFilters] = useAgentsFilters()
+interface Props {
+  option: SearchFilterOption
+}
+
+export function SearchFilter({ option }: Props) {
+  const [filters, setFilters] =
+    option === SearchFilterOption.Meetings
+      ? useMeetingsFilters()
+      : useAgentsFilters()
   return (
     <div className='relative'>
       <Input
