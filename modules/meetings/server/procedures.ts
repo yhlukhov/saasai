@@ -11,8 +11,14 @@ import {
   MAX_PAGE_SIZE,
   DEFAULT_PAGE_SIZE,
 } from '@/constants'
-import { meetingsInsertSchema, meetingsRemoveSchema, meetingsUpdateSchema } from '../schemas'
+import {
+  meetingsInsertSchema,
+  meetingsRemoveSchema,
+  meetingsUpdateSchema,
+} from '../schemas'
 import { MeetingStatus } from '../types'
+import { streamVideo } from '@/lib/stream-video'
+import { generateAvatarUri } from '@/lib/avatar'
 
 export const meetingsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -118,7 +124,45 @@ export const meetingsRouter = createTRPCRouter({
         })
         .returning()
 
-      // TODO: Create stream call, upseart stream users
+      const call = streamVideo.video.call('default', createdMeeting.id)
+      await call.create({
+        data: {
+          created_by_id: ctx.auth.user.id,
+          custom: {
+            meetingId: createdMeeting.id,
+            meetingName: createdMeeting.name
+          },
+          settings_override: {
+            transcription: {
+              language: 'en',
+              mode: 'auto-on',
+              closed_caption_mode: 'auto-on'
+            },
+            recording: {
+              mode: 'auto-on',
+              quality: '360p'
+            }
+          }
+        }
+      })
+      const [existingAgent] = await db
+        .select()
+        .from(agents)
+        .where(eq(agents.id, createdMeeting.agentId))
+      if(!existingAgent) {
+        throw new TRPCError({code: 'NOT_FOUND', message: 'Agent not found'})
+      }
+      await streamVideo.upsertUsers([
+        {
+          id: existingAgent.id,
+          name: existingAgent.name,
+          image: generateAvatarUri({
+            seed: existingAgent.name,
+            variant: 'botttsNeutral'
+          })
+        }
+      ])
+      
       return createdMeeting
     }),
 
@@ -150,4 +194,24 @@ export const meetingsRouter = createTRPCRouter({
       }
       return removedMeeting
     }),
+
+  generateToken: protectedProcedure.mutation(async ({ ctx }) => {
+    const { id, name, image } = ctx.auth.user
+    await streamVideo.upsertUsers([
+      {
+        id,
+        name,
+        role: 'admin',
+        image: image ?? generateAvatarUri({ seed: name, variant: 'initials' }),
+      },
+    ])
+    const expirationTime = Math.floor(Date.now() / 1000) + 3600
+    const issuedAt = Math.floor(Date.now() / 1000) - 60
+    const token = streamVideo.generateUserToken({
+      user_id: id,
+      exp: expirationTime,
+      validity_in_seconds: issuedAt
+    })
+    return token
+  }),
 })
