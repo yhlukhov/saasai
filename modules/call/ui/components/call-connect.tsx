@@ -64,7 +64,7 @@ export function CallConnect({
 
       const _call = client.call('default', meetingId)
       _call.camera.disable()
-      _call.microphone.disable()
+      _call.microphone.enable()
       setCall(_call)
       return function cleanup() {
         if (_call.state.callingState !== CallingState.LEFT) {
