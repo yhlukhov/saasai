@@ -1,7 +1,6 @@
 'use client'
 //-- external imports
 import { format } from 'date-fns'
-import humanizeDuration from 'humanize-duration'
 import { createColumnHelper } from '@tanstack/react-table'
 import {
   CircleCheckIcon,
@@ -16,7 +15,7 @@ import { type DataTableFeatures } from '@/components/data-table-features'
 import { type MeetingGetMany } from '../../types'
 import { GeneratedAvatar } from '@/components/generated-avatar'
 import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
+import { cn, formatDuration } from '@/lib/utils'
 
 const statusIconMap = {
   upcoming: ClockArrowUpIcon,
@@ -38,14 +37,6 @@ const columnHelper = createColumnHelper<
   DataTableFeatures,
   MeetingGetMany[number]
 >()
-
-function formatDuration(seconds: number) {
-  return humanizeDuration(seconds * 1000, {
-    largest: 1,
-    round: true,
-    units: ['h', 'm', 's'],
-  })
-}
 
 export const columns = columnHelper.columns([
   columnHelper.accessor('name', {
