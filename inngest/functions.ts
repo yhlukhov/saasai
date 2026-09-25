@@ -11,7 +11,7 @@ const summarizer = createAgent({
   name: 'summarizer',
   system: SYS_PROMPT.trim(),
   model: openai({
-    model: 'gpt-4o',
+    model: 'gpt-6-luna',
     apiKey: process.env.OPENAI_API_KEY,
   }),
 })
