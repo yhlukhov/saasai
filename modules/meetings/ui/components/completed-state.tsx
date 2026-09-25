@@ -14,6 +14,8 @@ import {
 import { GeneratedAvatar } from '@/components/generated-avatar'
 import { format } from 'date-fns'
 import { formatDuration } from '@/lib/utils'
+import { Transcript } from './transcript'
+import { ChatProvider } from './chat-provider'
 
 interface Props {
   meeting: MeetingGetOne
@@ -151,6 +153,12 @@ export function CompletedState({ meeting }: Props) {
               </div>
             </div>
           </div>
+        </TabsContent>
+        <TabsContent value='transcript'>
+          <Transcript meetingId={meeting.id} />
+        </TabsContent>
+        <TabsContent value='chat'>
+          <ChatProvider meetingId={meeting.id} meetingName={meeting.name} />
         </TabsContent>
       </Tabs>
     </div>
