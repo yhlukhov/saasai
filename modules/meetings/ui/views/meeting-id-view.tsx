@@ -90,7 +90,7 @@ export function MeetingIdView({ meetingId }: Props) {
           <UpcomingState
             meetingId={meetingId}
             isCancelling={false}
-            onCancelMeeting={() => {}}
+            onCancelMeeting={handleRemoveMeeting}
           />
         )}
         {isCompleted && <CompletedState meeting={meeting} />}
