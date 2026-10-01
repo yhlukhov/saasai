@@ -23,7 +23,7 @@ interface Props {
   userImage: string|undefined
 }
 
-export function ChatUI({meetingId, meetingName, userId, userImage, userName}:Props) {
+export function ChatUI({meetingId, userId, userImage, userName}:Props) {
   const trpc = useTRPC()
   const [channel, setChannel] = useState<StreamChannel>()
   const {mutateAsync: generateChatToken} = useMutation(

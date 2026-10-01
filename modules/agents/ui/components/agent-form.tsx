@@ -16,6 +16,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { GeneratedAvatar } from '@/components/generated-avatar'
+import { useRouter } from 'next/navigation'
 
 interface AgentFormProps {
   onSuccess?: () => void
@@ -29,16 +30,21 @@ export function AgentForm({
   initialValues,
 }: AgentFormProps) {
   const trpc = useTRPC()
+  const router = useRouter()
   const queryClient = useQueryClient()
 
   const createAgent = useMutation(
     trpc.agents.create.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries(trpc.agents.getMany.queryOptions({}))
+        await queryClient.invalidateQueries(trpc.premium.getFreeUsage.queryOptions())
         onSuccess?.()
       },
-      onError: ({message}) => {
+      onError: ({message, data}) => {
         toast.add({title:message})
+        if(data?.code === 'FORBIDDEN') {
+          router.push('/upgrade')
+        }
       },
     }),
   )

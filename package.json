@@ -19,6 +19,8 @@
     "@hookform/resolvers": "^5.9.1",
     "@inngest/agent-kit": "^0.13.2",
     "@neondatabase/serverless": "^1.1.0",
+    "@polar-sh/better-auth": "^2.0.0",
+    "@polar-sh/sdk": "^1.0.0",
     "@shadcn/react": "^0.3.0",
     "@stream-io/node-sdk": "^0.8.6",
     "@stream-io/openai-realtime-api": "^0.4.2",

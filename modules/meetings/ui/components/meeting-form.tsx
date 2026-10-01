@@ -19,6 +19,7 @@ import {
   FieldLabel,
   FieldDescription,
 } from '@/components/ui/field'
+import { useRouter } from 'next/navigation'
 
 interface MeetingFormProps {
   onSuccess?: (id?: string) => void
@@ -32,6 +33,7 @@ export function MeetingForm({
   initialValues,
 }: MeetingFormProps) {
   const trpc = useTRPC()
+  const router = useRouter()
   const queryClient = useQueryClient()
   const [openNewAgentDialog, setOpenNewAgentDialog] = useState(false)
   const [agentSearch, setAgentSearch] = useState('')
@@ -49,12 +51,16 @@ export function MeetingForm({
         await queryClient.invalidateQueries(
           trpc.meetings.getMany.queryOptions({}),
         )
-        // TODO: Invalidate free tier usage
+        await queryClient.invalidateQueries(
+          trpc.premium.getFreeUsage.queryOptions(),
+        )
         onSuccess?.(data.id)
       },
-      onError: ({ message }) => {
+      onError: ({ message, data }) => {
         toast.add({ title: message })
-        // TODO: Check if error code is "FORBIDDEN", redirect to "/update"
+        if (data?.code === 'FORBIDDEN') {
+          router.push('/upgrade')
+        }
       },
     }),
   )
@@ -99,7 +105,10 @@ export function MeetingForm({
 
   return (
     <>
-      <NewAgentDialog open={openNewAgentDialog} onOpenChange={setOpenNewAgentDialog} />
+      <NewAgentDialog
+        open={openNewAgentDialog}
+        onOpenChange={setOpenNewAgentDialog}
+      />
       <form
         className='px-3 py-2 pt-0'
         id='form-sign-up'

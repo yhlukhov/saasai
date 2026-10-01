@@ -14,7 +14,7 @@ import {
 
 import { db } from '@/db'
 import { agents, meetings, user } from '@/db/schema'
-import { createTRPCRouter, protectedProcedure } from '@/trpc/init'
+import { createTRPCRouter, premiumProcedure, protectedProcedure } from '@/trpc/init'
 import {
   DEFAULT_PAGE,
   MIN_PAGE_SIZE,
@@ -124,7 +124,7 @@ export const meetingsRouter = createTRPCRouter({
       }
     }),
 
-  create: protectedProcedure
+  create: premiumProcedure('meetings')
     .input(meetingsInsertSchema)
     .mutation(async ({ ctx, input }) => {
       const [createdMeeting] = await db
